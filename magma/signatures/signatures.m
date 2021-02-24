@@ -110,7 +110,7 @@ end procedure;
 
 /* Retrieve from disk and return the signatures corresponding to g,d,r */
 _Signatures_g_d_r:=function(g,d,r)
-   	signatures_d_r:=ReadFromFileLe(_SIGNATURES_PATH,[d,r]);
+   	signatures_d_r:=ReadFromFile(_SIGNATURES_PATH,[d,r]);
    	if g gt #signatures_d_r then
      		error "signatures only computed up to g=",#signatures_d_r;
    	end if;
