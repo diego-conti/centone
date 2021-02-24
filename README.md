@@ -8,10 +8,10 @@ This paper is referred to as [CGP] in the code.
 If you use this code in your research, please quote our paper!
 
 The program consists of three Magma scripts:
-###computesignatures.m
+### computesignatures.m
 Computes the admissible signatures and stores them on disk, in the directory signatures
 
-###createlistocomputations.m
+### createlistocomputations.m
 Creates a list of computations to be passed to the main script
 
 ### runcomputation.m
