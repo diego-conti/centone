@@ -1,3 +1,22 @@
+/***************************************************************************
+	Copyright (C) 2021 by Diego Conti, Alessandro Ghigi and Roberto Pignatelli.
+
+	This file is part of centone.
+	Centone is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <https://www.gnu.org/licenses/>.
+****************************************************************************
+	Functions to iterate through multisets taken up to the action of a group.
+*/
 AddToSetAndMultiplicity:=function(setsAndMultiplicities, set, multiplicity)
 	return Append(setsAndMultiplicities,[* set,multiplicity *]);
 end function;
@@ -7,7 +26,6 @@ OrbitRepresentativesAndStabilizers:=function(X,H)
 		representatives:=[Rep(O) : O in Orbits(H,asGSet)];
 		return [ [* B, Stabilizer(H,asGSet,B) *] : B in representatives];
 end function;
-
 	
 	
 forward IterateOverMultisetsWithElementsIn;
@@ -36,22 +54,6 @@ IterateOverMultisetsWithElementsIn:=procedure(A,n,setsAndMultiplicities, multise
 	end for;
 end procedure;
 
-IterateOverMultisetsWithCommonUnderlyingSet:=procedure(setsAndMultiplicities,reducedSets,H,f,onChanged,argA,~arg1,~arg2,~arg3)
-	if IsEmpty(setsAndMultiplicities) then 
-		underlyingSet:=SetToMultiset(&join ({set[1] : set in reducedSets }));
-		IterateOverMultisets(reducedSets,underlyingSet,H,f,argA,~arg1,~arg2,~arg3);
-		onChanged(argA,~arg1,~arg2,~arg3);
-		return;
-	end if;
-	lastSet,multiplicityOfLastSet:=Explode(setsAndMultiplicities[#setsAndMultiplicities]);
-	for k in [1..Min(multiplicityOfLastSet,#lastSet)] do
-		for subsetAndStabilizer in OrbitRepresentativesAndStabilizers(Subsets(lastSet,k),H) do
-			B,stabB:=Explode(subsetAndStabilizer);				
-			$$(Prune(setsAndMultiplicities),AddToSetAndMultiplicity(reducedSets,B,multiplicityOfLastSet-#B),stabB,f,onChanged,argA,~arg1,~arg2,~arg3);
-		end for;
-	end for;
-end procedure;
-
 SetsAndMultiplicities:=function(mu,setFromIndex)
 	setsAndMultiplicities:= [];
 	k:=1;
@@ -66,5 +68,4 @@ SetsAndMultiplicities:=function(mu,setFromIndex)
 	end while;
 	return setsAndMultiplicities;
 end function;
-
 

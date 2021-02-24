@@ -1,4 +1,21 @@
-/* This file implements disk storage and retrieval of magma objects. It exposes two functions:
+/***************************************************************************
+	Copyright (C) 2021 by Diego Conti, Alessandro Ghigi and Roberto Pignatelli.
+
+	This file is part of centone.
+	Centone is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <https://www.gnu.org/licenses/>.
+****************************************************************************
+ This file implements disk storage and retrieval of magma objects. It exposes two functions:
 
 PersistToFile(path,parameters,object) takes an existing directory, a sequence of integers and a magma object; it creates a file inside the directory, with name determined by the parameters, and stores the magma object in it.
 ReadFromFile(path,parameters) takes an existing directory and a sequence of integers; it returns the magma object stored in the file indexed by the parameters
@@ -6,32 +23,30 @@ ReadFromFile(path,parameters) takes an existing directory and a sequence of inte
 Functions with name starting with _ are considered part of the implementation.
 */
 
-//identifica il formato con cui sono salvati i dati. Da aggiornare se il formato viene cambiato.
-_Schema:="Ghighi 1";
+//identifies the format used to save data
+_Schema:="Centone 1";
 
-/*contenitore per dati da salvare su disco. L'oggetto viene "inscatolato" tra la descrizione dello schema e un SeqEnum che descrive il contenuto,
-per minimizzare l'impatto di file corrotti etc.*/
-
-_DatiPersistenti:=recformat< schema: MonStgElt, object, parameters:SeqEnum>;
+/*Container for MAGMA objects to be persisted. The MAGMA object is serialized to disk between the schema description and a SeqEnum descriving content, in order to minimize the impact of file corruption*/
+_PersistentData:=recformat< schema: MonStgElt, object, parameters:SeqEnum>;
 
 
-/* crea un nome file valido a partire da una sequenza di interi */	
-NomeFileDaParametri:=function(parameters) 
+/*Create a filename from a sequence of parameters (typically integers)*/
+FilenameFromParameters:=function(parameters) 
 	return &cat [IntegerToString(i) cat "." : i in parameters] cat "data";
 end function;
 
-/* scrive un oggetto su un file
-	path: una directory già esistente dove scrivere i dati
-	parameters: una sequenza di interi che descrive il contenuto
-	object: un oggetto di magma
-	
-Nota: questa funzione viene usata internamente. Usare PersistiSuFile.
+/* Write an object to file
+	path: an existing folder where data should be saved
+	parameters: a sequence of integers describing content
+	object: a magma object
+
+Note: this function is for internal use.
 */
-_ScriviSuFile:=procedure(path,parameters,object)
+_WriteToFile:=procedure(path,parameters,object)
 	curdir:=GetCurrentDirectory();
 	try 
 		ChangeDirectory(path);
-		PrintFileMagma(NomeFileDaParametri(parameters),object: Overwrite:=true);
+		PrintFileMagma(FilenameFromParameters(parameters),object: Overwrite:=true);
 	catch e
 		ChangeDirectory(curdir);
 		error "error writing to file", e`Object;
@@ -39,20 +54,20 @@ _ScriviSuFile:=procedure(path,parameters,object)
 		ChangeDirectory(curdir);
 end procedure;
 
-/* legge un oggetto da un file
-	path: la directory che contiene i dati
-	parameters: una sequenza di interi che descrive il contenuto
+/* Read an object from file
+	path: the directory containing the data
+	parameters: a sequence of integers describing content
 
-Ritorna un oggetto di magma.
+Return a magma object
 
-Nota: questa funzione viene usata internamente. Usare LeggiDaFile.
+Note: this function is for internal use.
 */
 
-_LeggiDaFile:=function(path,parameters)
+_ReadFromFile:=function(path,parameters)
 	curdir:=GetCurrentDirectory();
 	try 
 		ChangeDirectory(path);
-		object:=Read(NomeFileDaParametri(parameters));
+		object:=Read(FilenameFromParameters(parameters));
 	catch e
 		ChangeDirectory(curdir);
 		error "error reading from file", e`Object;
@@ -61,9 +76,9 @@ _LeggiDaFile:=function(path,parameters)
 	return object;
 end function;
 
-_VerificaCoerenteConSchema:=procedure(~persistedObject,~parameters) 
-	if not Sprint(Format(persistedObject)) cmpeq Sprint(_DatiPersistenti) then
-		error "persistedObject is not a rec<_DatiPersistenti>";
+_VerifyConsistencyWithSchema:=procedure(~persistedObject,~parameters) 
+	if not Sprint(Format(persistedObject)) cmpeq Sprint(_PersistentData) then
+		error "persistedObject is not a rec<_PersistentData>";
 	end if;
 	if not persistedObject`schema eq _Schema then
 		error "wrong schema, " cat _Schema cat " expected";
@@ -73,34 +88,35 @@ _VerificaCoerenteConSchema:=procedure(~persistedObject,~parameters)
 	end if;
 end procedure;
 
-/* legge un oggetto da un file
-	path: la directory che contiene i dati
-	parameters: una sequenza di interi che descrive il contenuto
+/* Read an object from file
+	path: the directory containing the data
+	parameters: a sequence of integers describing content
 
-Ritorna un oggetto di magma
+Return a magma object
 */
 
-LeggiDaFile:=function(path,parameters)
+ReadFromFile:=function(path,parameters)
 	if not ExtendedType(parameters) eq SeqEnum[RngIntElt] then
 		error "LeggiDaFile: parameters should be a sequence of integers";
 	end if;
-	persistedObject:=eval(_LeggiDaFile(path,parameters));
-	_VerificaCoerenteConSchema(~persistedObject,~parameters);
+	persistedObject:=eval(_ReadFromFile(path,parameters));
+	_VerifyConsistencyWithSchema(~persistedObject,~parameters);
 	return persistedObject`object;
 end function;
 
 
-/* scrive un oggetto su un file
-	path: una directory già esistente dove scrivere i dati
-	parameters: una sequenza di interi che descrive il contenuto
-	object: un oggetto di magma
-*/
+/* Write an object to file
+	path: an existing folder where data should be saved
+	parameters: a sequence of integers describing content
+	object: a magma object
 
-PersistiSuFile:=procedure(path, parameters, object)
-	persistentObject:=rec<_DatiPersistenti|>;
+Note: this function is for internal use.
+*/
+PersistToFile:=procedure(path, parameters, object)
+	persistentObject:=rec<_PersistentData|>;
 	persistentObject`schema:=_Schema;	
 	persistentObject`object:=object;
 	persistentObject`parameters:=parameters;
-	_ScriviSuFile(path,parameters,persistentObject);
+	_WriteToFile(path,parameters,persistentObject);
 end procedure;
 

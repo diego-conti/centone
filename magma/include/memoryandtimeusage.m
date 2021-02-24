@@ -15,24 +15,16 @@
 	You should have received a copy of the GNU General Public License
 	along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ****************************************************************************
-/* This function allows iterating through nondecreasing sequences 1\leq i_1\leq ... \leq i_h\leq x 
-	It takes a nondecreasing sequence [i_1,...,i_h], which is modified into the next sequence if it exists, or the empty sequence [].
-  The parameter max is the upper bound x for elements of the sequence.
- */
-NextSequence:=procedure(~sequence, max); //SeqEnum, int
-		i:=#sequence;
-		while (i gt 0) and (sequence[i] eq max)  do
-			i-:=1;
-		end while;
-		if i eq 0 then
-			sequence:=[]; 
-			return;
-		end if;
-		sequence[i]+:=1;
-		while i lt #sequence do
-			sequence[i+1]:=sequence[i];
-			i+:=1;
-		end while;
+	Functions to keep track of memory and time usage in computations
+*/
+ResetTimeAndMemoryUsage:=procedure(~timeVariable)
+	timeVariable:=Cputime();
+	ResetMaximumMemoryUsage();
 end procedure;
 
+
+MBUsedAndTimeSinceLastReset:=function(timeVariable)
+	elapsedTime:=Cputime()-timeVariable;
+	return Sprint(elapsedTime) cat "; " cat Sprint(Truncate(GetMaximumMemoryUsage()/(1024*1024)));
+end function;
 

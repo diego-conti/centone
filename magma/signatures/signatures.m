@@ -1,4 +1,22 @@
-/* This file implements, with minor modifications, Algorithm 1 in D. Conti, A. Ghigi, R. Pignatelli. Some evidence for the Coleman-Oort conjecture.
+/***************************************************************************
+	Copyright (C) 2021 by Diego Conti, Alessandro Ghigi and Roberto Pignatelli.
+
+	This file is part of centone.
+	Centone is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <https://www.gnu.org/licenses/>.
+****************************************************************************
+
+This file implements, with minor modifications, Algorithm 1 in [CGP].
 In sight of future use, we also include the case of 3 branching points and the case where one of the m_r is equal to the order of the group.
 
 This file exposes the following functions:
@@ -13,7 +31,7 @@ Functions with name starting with _ are considered part of the implementation.
 
 load "magma/signatures/sequences.m";
 load "magma/signatures/persist.m";
-load "magma/definizionicomuni.m";
+load "magma/include/genus.m";
 
 _SIGNATURES_PATH:="signatures";	//a directory where signatures are stored
 
@@ -60,7 +78,7 @@ Note that g=1 is allowed here because the condition g>2 is only necessary in ord
  */
 _ComputeAndSaveSignatures_d_r:=procedure(d,r,maxG)
 	signatures:=_ComputeSignatures_d_r(d,r,maxG);
-	PersistiSuFile(_SIGNATURES_PATH,[d,r],signatures);
+	PersistToFile(_SIGNATURES_PATH,[d,r],signatures);
 end procedure;
 
 _MaxBranchPoints:=function(g,d)
@@ -92,7 +110,7 @@ end procedure;
 
 /* Retrieve from disk and return the signatures corresponding to g,d,r */
 _Signatures_g_d_r:=function(g,d,r)
-   	signatures_d_r:=LeggiDaFile(_SIGNATURES_PATH,[d,r]);
+   	signatures_d_r:=ReadFromFileLe(_SIGNATURES_PATH,[d,r]);
    	if g gt #signatures_d_r then
      		error "signatures only computed up to g=",#signatures_d_r;
    	end if;

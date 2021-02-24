@@ -1,5 +1,23 @@
-//script to compute the character of the representation phi from a spherical system of generators
-//based on a script by Gleissner [citation here]
+/***************************************************************************
+	Copyright (C) 2021 by Diego Conti, Alessandro Ghigi and Roberto Pignatelli.
+
+	This file is part of centone.
+	Centone is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <https://www.gnu.org/licenses/>.
+****************************************************************************
+script to compute the character of the representation phi from a spherical system of generators
+based on the algorithm in Ch.~Gleissner, Threefolds Isogenous to a Product and Product quotient Threefolds with CanonicalSingularities. PhD Dissertation. Bayreuth, 2016. https://epub.uni-bayreuth.de/2981
+*/  
 
 /* Let X  be a character of the group G and g be a group element. The script "pol" determines the 
 characteristic polynomial of "rho(g)", where "rho" is a representation affording the character X. 

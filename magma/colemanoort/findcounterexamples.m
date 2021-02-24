@@ -1,4 +1,21 @@
-/* This script implements Algorithm 4 in [CGP]
+/***************************************************************************
+	Copyright (C) 2021 by Diego Conti, Alessandro Ghigi and Roberto Pignatelli.
+
+	This file is part of centone.
+	Centone is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <https://www.gnu.org/licenses/>.
+****************************************************************************
+This script implements Algorithm 4 in [CGP]
 */
 
 load "magma/colemanoort/findcounterexamplesabelian.m";
@@ -29,7 +46,14 @@ _CompleteSequenceOfGeneratorsIn:=procedure(sequence,setsOfElements, lastSet, G,~
 	result:=[];
 	end procedure;
 
-	//data una sequenza di insiemi insiemiDiElementi=[X_1,...,X_r] e un gruppo G, ritorna [] oppure la prima sequenza [g_1,...,g_r] con g_i in X_i tali che g_1,...,g_r generano il gruppo G e g_1...g_r=1
+/*given a sequence of sets and a group, return a system of spherical generators with one element in each set if it exists, or [] otherwise
+
+setsOfElements: a sequence of subsets of the group G
+G: a group
+subsetsThatGenerate: a list of sets that are already known to generate G. This list is passed as an argument to DetermineWhetherSubsetGenerates, which updates it.
+subsetsThatDoNotGenerate: a list of sets that are already known not to generate G. This list is passed as an argument to DetermineWhetherSubsetGenerates, which updates it.
+result: a variable where the system of spherical generators is stored, or [] if it does not exist
+*/
 _FindSequenceOfSphericalGeneratorsIn:=procedure(setsOfElements, G,~subsetThatGenerate,~subsetThatDoNotGenerate,~result)
 	lastSet:=setsOfElements[#setsOfElements];
 	withoutLast:=Prune(setsOfElements);

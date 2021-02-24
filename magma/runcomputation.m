@@ -1,17 +1,36 @@
-/* 
+/***************************************************************************
+	Copyright (C) 2021 by Diego Conti, Alessandro Ghigi and Roberto Pignatelli.
+
+	This file is part of centone.
+	Centone is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <https://www.gnu.org/licenses/>.
+***************************************************************************
+
 This script runs the code that tests the Coleman-Oort conjecture on spherical systems of generators corresponding to a given set of signatures and groups, e.g:
-magma processID:=1 dataFile:=data.csv outputPath:=co memory:=1 magma/runcomputation.m
+magma processId:=1 dataFile:=data.csv outputPath:=co memory:=1 magma/runcomputation.m
 invokes the test on the signatures contained in the file data.csv, using a maximum memory of 1 GB and writing the output to co/1.csv.
 The script performs one computation at a time; if memory runs out during a computation, the script terminates. The offending data can be recovered by comparing the dataFile to the output.
 
 It takes the following parameters:
-processID a unique string identifying the process. Useful for parallelization; it determines the name of the file to be used for output
+processId a unique string identifying the process. Useful for parallelization; it determines the name of the file to be used for output
 dataFile a file containing the computations to be performed, each line having the form d;n;[m_1,...,m_r], corresponding to SmallGroup(d,n) and signature [m_1,...,m_r]
-outputPath a directory where output should be stored
+outputPath a directory where output should be stored; the directory must already exist
 memory the memory limit in GB
 */
 
-load "magma/colemanoort/colemanoort.m"
+load "magma/colemanoort/findcounterexamples.m";
+load "magma/include/genus.m";
+load "magma/include/memoryandtimeusage.m";
 
 if not assigned processId then error "variable processId should be assigned to unique string"; end if;
 if not assigned dataFile then error "variable dataFile should point to a valid data file"; end if;
@@ -45,12 +64,12 @@ Admissible:=function(G, M)
 	if  ( #M eq 4) and IsAbelian(G) then return false,"abelian"; end if;
 	orders:={Order(g): g in G};
 	if exists {m : m in M | m notin orders} then return false,"order"; end if;
-  g:=Integers() ! Genere(M,Order(G));
+  g:=Integers() ! Genus(M,Order(G));
 	if g gt 2 and exists {o: o in orders | o gt 4*(g-1)} then return false,"KW"; end if;
 	invariants:=AbelianizationInvariants(G); 
 	if # [x: x in invariants | IsEven(x)] ge 4  then return false,"(Z_2)^4"; end if;
 	if CannotGenerateAbelianization(M,invariants) then return false,"abelianization"; end if;
- 	return true;
+ 	return true,0;
 end function;
 
 ParametersFormat:=recformat< d: Integers(), n: Integers(), M : SeqEnum>;
@@ -72,9 +91,20 @@ WriteToOutputFile:=procedure(line,outputPath)
 	Write(outputPath cat "/" cat Sprint(processId) cat ".csv",line);
 end procedure;
 
+ListToCsv:=function(containerOfPrintable, separator) 
+	result:="";
+	if IsEmpty(containerOfPrintable) then return result; end if;
+	result:=Sprint(containerOfPrintable[1]);	
+	for i in [2..#containerOfPrintable] do
+		result cat:=separator;
+		result cat:=Sprint(containerOfPrintable[i]);
+	end for;
+	return result;
+end function;
+
 WriteLineToOutputFile:=procedure(parameters, runningTime, data,outputPath)
 	firstPart:=[* parameters`d, parameters`n, parameters`M,MBUsedAndTimeSinceLastReset(runningTime),VERSION *];
-	line:= FrapponiSeparatore(firstPart,";") cat ";{" cat FrapponiSeparatore(data,":") cat "}";
+	line:= ListToCsv(firstPart,";") cat ";{" cat ListToCsv(data,":") cat "}";
 	WriteToOutputFile(line,outputPath);
 end procedure;
 
