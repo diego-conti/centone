@@ -1,6 +1,8 @@
+cd `dirname $0`/..
 computations=100	#number of computations to be performed by each magma process
 
 mkdir -p co
+rm co/* -f
 awk -F";" '
 {
 	d = $1
@@ -12,3 +14,5 @@ awk -F";" '
 
 parallel magma -b processId:={} dataFile:={} outputPath:=co memory:=1 magma/runcomputation.m ::: data*
 rm data*
+echo Counterexamples:
+grep -v "{}" co/* | grep -v "{I:"

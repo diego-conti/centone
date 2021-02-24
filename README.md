@@ -18,7 +18,7 @@ Creates a list of computations to be passed to the main script
 Main script that iterates through signatures, looking for counterexamples.
 
 
-The sh directory contains some bash scrips that invoke the Magma scripts with example parameters. These scripts employ parallel and awk, and they have been tested on CentOS Linux 7.
+The sh directory contains some bash scrips that invoke the Magma scripts with example parameters. These scripts employ parallel awk and grep, and they have been tested on CentOS Linux 7.
 
 ###	computesignatures.sh
 Computes signatures up to d=2000
