@@ -32,7 +32,7 @@ _AddByGenus:=procedure(~signatures, indexList,d,nontrivialDivisors)
 		maxG:=#signatures;	//signatures is an array indexed by genus, so the size of the array representes the maximum genus
 		integral,integerG:=IsCoercible(Integers(),g);
 		if integral and integerG gt 0 and integerG le maxG then 
-			signature:= rec<SignatureFormat>;
+			signature:= rec<SignatureFormat|>;
 			signature`d:=d;
 			signature`M:=sequenceOfDivisors;
 			Append(~(signatures[integerG]),signature);
@@ -45,10 +45,10 @@ Returns an array whose g-th element is the list of signatures of genus g
 _ComputeSignatures_d_r:=function(d,r,maxG)
 	result:=[[] : n in [1..maxG]];
 	allDivisors:=Divisors(d);
-	nontrivialDivisors:=allDivisors[2..#tuttiDivisori];
+	nontrivialDivisors:=allDivisors[2..#allDivisors];
 	sequence:=[1: x in [1..r]];
 	while not IsEmpty(sequence) do 
-			_AddByGenus(~result,~sequence,d,nontrivialDivisors);
+			_AddByGenus(~result,sequence,d,nontrivialDivisors);
 			NextSequence(~sequence,#nontrivialDivisors);
 	end while;
 	return result;
@@ -101,7 +101,7 @@ end function;
 
 /* Retrieve from disk and return signatures of genus g>1 */
 Signatures:=function(g)
-	if g gt 1 then error "Signatures invoked with g=",g, ", g>1 expected"; end if;
+	if g le 1 then error "Signatures invoked with g=",g, ", g>1 expected"; end if;
 	signatures:=[];
 	for d in _GroupOrdersForThreeBranchPoints(g) do
 		signatures cat:=  _Signatures_g_d_r(g,d,3);
@@ -116,7 +116,7 @@ end function;
 
 /* Retrieve from disk and return signatures of genus g with r>=3 branch points*/
 Signatures_g_r:=function(g,r)
-	if g gt 1 then error "Signatures_g_r invoked with g=",g, ", g>1 expected"; end if;
+	if g le 1 then error "Signatures_g_r invoked with g=",g, ", g>1 expected"; end if;
 	signatures:=[];
 	if r eq 3 then 
 		for d in _GroupOrdersForThreeBranchPoints(g) do

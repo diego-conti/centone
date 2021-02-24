@@ -17,7 +17,7 @@ _DatiPersistenti:=recformat< schema: MonStgElt, object, parameters:SeqEnum>;
 
 /* crea un nome file valido a partire da una sequenza di interi */	
 NomeFileDaParametri:=function(parameters) 
-	return &cat [IntegerToString(i) cat "." : i in parameters] cat ".data";
+	return &cat [IntegerToString(i) cat "." : i in parameters] cat "data";
 end function;
 
 /* scrive un oggetto su un file
