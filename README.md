@@ -2,12 +2,14 @@
 A Magma program to test the Coleman-Oort conjecture on spherical systems of generators
 
 The algorithm is explained in
-[CGP] D. Conti, A. Ghigi, R. Pignatelli. Some evidence for the Coleman-Oort conjecture
+[CGP] D. Conti, A. Ghigi, R. Pignatelli. Some evidence for the Coleman-Oort conjecture. [arXiv:2102.12349](http://arxiv.org/abs/2102.12349)
+
 This paper is referred to as [CGP] in the code.
 
 If you use this code in your research, please quote our paper!
 
-The program consists of three Magma scripts:
+### Magma code
+The program consists of four Magma scripts:
 ### computesignatures.m
 Computes the admissible signatures and stores them on disk, in the directory signatures
 
@@ -15,10 +17,26 @@ Computes the admissible signatures and stores them on disk, in the directory sig
 Creates a list of computations to be passed to the main script
 
 ### runcomputation.m
-Main script that iterates through signatures, looking for counterexamples.
+Main script that iterates through signatures, looking for counterexamples. The output is a CSV file where each line takes the following form:
 
+d;n;M;time;memory;algorithm;generators
 
-The sh directory contains some bash scrips that invoke the Magma scripts with example parameters. These scripts employ parallel awk and grep, and they have been tested on CentOS Linux 7.
+* _d_ group order
+* _n_ group number
+* _M_ signature
+* _time_ computation time in seconds
+* _memory_ maximum memory usage in MB
+* _algorithm_ string identifying the algorithm version
+* _generators_ One of the following:
+    * {I:reason} if computation was skipped; the string _reason_ then identifies the criterion used to exclude it;
+    * {} if no counterexample was found
+    * otherwise, a list of counterexamples, one in each Aut(G)-orbit of refined passports
+
+### printcounterexamples.m
+Print all counterexamples that have been computed
+
+## Bash scripts
+The sh directory contains some bash scrips that invoke the Magma scripts with example parameters. These scripts employ parallel and awk, and they have been tested on CentOS Linux 7. They should be run in the order in which they appear here:
 
 ###	computesignatures.sh
 Computes signatures up to d=2000
@@ -29,5 +47,8 @@ Creates two lists of computations, corresponding to noncylic signatures with g<=
 ### runcomputations.sh
 Runs the main script through a list of computations, using GNU parallel to parallelize the computations. No attempt is made to handle out-of-memory errors.
 For example, run sh/runcomputations.sh 2-7.csv to recover the known examples with 2<=g<=7.
+
 *Disclaimer*: the script runcomputations.sh is included for demonstration purposes. A more sophisticated script was needed in order to parallelize effectively the computation for g<=100.
 
+### printcounterexamples.sh
+Print all counterexamples that have been computed
