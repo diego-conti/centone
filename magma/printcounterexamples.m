@@ -47,4 +47,4 @@ PrintCounterexamples:=procedure(csvfile)
 end procedure;
 
 IterateThroughDirectory(path,PrintCounterexamples);
-
+quit;

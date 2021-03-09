@@ -59,13 +59,17 @@ WriteLine:=procedure(d,n,M,file)
 end procedure;
 end if;
 
+RangeOfSmallGroups:=function(d)
+	return "1.." cat Sprint(NumberOfSmallGroups(d));
+end function;
+
 WriteComputations:=procedure(g,file)
 	boundR:=2*g+2;
 	if maxR gt 0 then boundR:=Min(boundR,maxR); end if;
 	for r in [minR..boundR] do
 	for signature in Signatures_g_r(g,r) do
 		d:=signature`d;
-		WriteLine(d,NumberOfSmallGroups(d),signature`M,file);
+		WriteLine(d,RangeOfSmallGroups(d),signature`M,file);
 	end for;
 	end for;
 end procedure;

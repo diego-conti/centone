@@ -1,17 +1,14 @@
-cd `dirname $0`/..
-computations=100	#number of computations to be performed by each magma process
-
 mkdir -p co
 rm co/* -f
 awk -F";" '
 {
 	d = $1
-	N = $2
+	split($2,N,"\.")
 	M = $3
-    for (n = 1; n <= N; n++)
+    for (n = 1; n <= N[3]; n++)
         print d, ";", n,";", M
-}' $1 | split - data -l $computations
+}' $1 >allcomputations.csv
 
-parallel magma -b processId:={} dataFile:={} outputPath:=co memory:=1 magma/runcomputation.m ::: data*
-rm data*
+magma -b processId:=1 dataFile:=allcomputations.csv outputPath:=co memory:=0 magma/runcomputation.m 
+rm allcomputations.csv
 
