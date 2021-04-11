@@ -9,6 +9,6 @@ awk -F";" '
         print d, ";", n,";", M
 }' $1 >allcomputations.csv
 
-magma -b processId:=1 dataFile:=allcomputations.csv outputPath:=co memory:=0 magma/runcomputation.m 
+magma -b processId:=1 dataFile:=allcomputations.csv outputPath:=co megabytes:=0 magma/runcomputation.m 
 rm allcomputations.csv
 

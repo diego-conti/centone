@@ -37,7 +37,7 @@ if assigned printVersion then print "v1"; quit; end if;
 if not assigned processId then error "variable processId should be assigned to unique string"; end if;
 if not assigned dataFile then error "variable dataFile should point to a valid data file"; end if;
 if not assigned outputPath then error "variable outputPath should point to a directory to contain the output"; end if;
-if not assigned memory then error  "variable memory should indicate a memory limit in GB (or 0 for no limit)"; end if;
+if not assigned megabytes then error  "variable megabytes should indicate a memory limit in MB (or 0 for no limit)"; end if;
 
 AbelianizationInvariants:=function(G)
 	group:=G;
@@ -133,7 +133,7 @@ FindCounterExamplesFromFile:=procedure(fileName,outputPath)
 end procedure;
 
 
-SetMemoryLimit(StringToInteger(memory)*1024*1024*1024);
+SetMemoryLimit(StringToInteger(megabytes)*1024*1024);
 SetQuitOnError(true);
 SetColumns(1024);
 
